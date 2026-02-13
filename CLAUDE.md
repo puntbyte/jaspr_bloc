@@ -12,7 +12,12 @@ State management package for Jaspr — like flutter_bloc or angular_bloc but for
 If you need to look at what we researched then we can do that here @../trt-ai-agent-development-system/docs/research/jaspr_bloc/index.md
 
 ## AI Agent Memory
-If you need to remember things across sessions use `Global Memory` at @../trt-ai-agent-development-system/projects/global-memory/index.md
+
+At the start of a session, check `Global Memory` for
+anything relevant to this project:
+@../trt-ai-agent-development-system/projects/global-memory/index.md
+
+Use it to remember things across sessions too.
 
 ## Epics, Stories and Implementation Logs
 Follow `Managing Epics and Stories` in @../trt-ai-agent-development-system/projects/jaspr_bloc/stories.md
