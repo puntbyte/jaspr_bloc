@@ -8,6 +8,9 @@ State management package for Jaspr — like flutter_bloc or angular_bloc but for
 - **Framework:** Jaspr
 - **Language:** Dart
 
+## Research
+If you need to look at what we researched then we can do that here @../trt-ai-agent-development-system/docs/research/jaspr_bloc/index.md
+
 ## AI Agent Memory
 If you need to remember things across sessions use `Global Memory` at @../trt-ai-agent-development-system/projects/global-memory/index.md
 

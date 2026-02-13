@@ -1,0 +1,20 @@
+name: jaspr_bloc
+description: A state management package for Jaspr that implements the BLoC pattern, enabling Jaspr apps to handle state the same way as Flutter apps.
+version: 0.1.0
+repository: https://github.com/t-river-technologies/jaspr_bloc
+
+environment:
+  sdk: ^3.10.8
+
+dependencies:
+  bloc: ^9.0.0
+  jaspr: ^0.22.0
+
+dev_dependencies:
+  bloc_test: ^10.0.0
+  jaspr_builder: ^0.22.0
+  jaspr_lints: ^0.6.0
+  jaspr_test: ^0.22.0
+  lints: ^5.0.0
+  mocktail: ^1.0.0
+  test: ^1.24.0
