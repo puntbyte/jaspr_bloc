@@ -7,3 +7,6 @@ library;
 
 // Export bloc package for convenience
 export 'package:bloc/bloc.dart';
+
+// Export mixin for subscription lifecycle management
+export 'src/bloc_subscription_mixin.dart';

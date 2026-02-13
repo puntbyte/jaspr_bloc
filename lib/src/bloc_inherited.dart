@@ -1,0 +1,45 @@
+import 'package:bloc/bloc.dart';
+import 'package:jaspr/jaspr.dart';
+
+/// Internal [InheritedComponent] that holds a [BlocBase] instance.
+///
+/// This component is used internally by [BlocProvider] to provide bloc
+/// instances down the component tree using Jaspr's dependency mechanism.
+///
+/// This class is not exported in the public API and should not be used
+/// directly by consumers of the jaspr_bloc package.
+class BlocInherited<T extends BlocBase<Object?>> extends InheritedComponent {
+  /// The bloc instance provided to descendant components.
+  final T bloc;
+
+  /// Creates a [BlocInherited] component.
+  ///
+  /// The [bloc] parameter is required and holds the bloc instance.
+  /// The [child] parameter is required and represents the descendant tree.
+  const BlocInherited({required this.bloc, required super.child, super.key});
+
+  /// Retrieves the nearest [BlocInherited] ancestor of type [T] from the
+  /// component tree.
+  ///
+  /// This method uses [dependOnInheritedComponentOfExactType] to look up
+  /// the bloc and will throw an assertion error if no provider is found.
+  ///
+  /// The [context] parameter is the build context from which to start the
+  /// lookup.
+  ///
+  /// Returns the bloc instance of type [T].
+  ///
+  /// Throws an [AssertionError] if no [BlocInherited<T>] is found in the
+  /// component tree.
+  static T of<T extends BlocBase<Object?>>(BuildContext context) {
+    final inherited = context
+        .dependOnInheritedComponentOfExactType<BlocInherited<T>>();
+    assert(inherited != null, 'No BlocProvider<$T> found in context');
+    return inherited!.bloc;
+  }
+
+  @override
+  bool updateShouldNotify(covariant BlocInherited<T> oldComponent) {
+    return bloc != oldComponent.bloc;
+  }
+}
