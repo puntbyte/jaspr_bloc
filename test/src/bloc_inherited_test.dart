@@ -49,7 +49,11 @@ void main() {
       tester,
     ) async {
       tester.pumpComponent(
-        BlocInherited<TestCubit>(bloc: cubit, child: const ConsumerComponent()),
+        BlocInherited<TestCubit>(
+          bloc: cubit,
+          stateVersion: 0,
+          child: const ConsumerComponent(),
+        ),
       );
 
       expect(find.text('Cubit state: 0'), findsOneComponent);
@@ -61,6 +65,7 @@ void main() {
         tester.pumpComponent(
           BlocInherited<TestCubit>(
             bloc: cubit,
+            stateVersion: 0,
             child: const div([
               div([
                 div([ConsumerComponent()]),
@@ -82,6 +87,7 @@ void main() {
         tester.pumpComponent(
           BlocInherited<TestCubit>(
             bloc: cubit1,
+            stateVersion: 0,
             child: const ConsumerComponent(),
           ),
         );
@@ -92,6 +98,7 @@ void main() {
         tester.pumpComponent(
           BlocInherited<TestCubit>(
             bloc: cubit2,
+            stateVersion: 0,
             child: const ConsumerComponent(),
           ),
         );
@@ -105,32 +112,30 @@ void main() {
     );
 
     testComponents(
-      'updateShouldNotify returns false when bloc instance is same',
+      'updateShouldNotify returns false when bloc instance and version are same',
       (tester) async {
         tester.pumpComponent(
           BlocInherited<TestCubit>(
             bloc: cubit,
+            stateVersion: 0,
             child: const ConsumerComponent(),
           ),
         );
 
         expect(find.text('Cubit state: 0'), findsOneComponent);
 
-        // Increment the cubit (same instance)
-        cubit.increment();
-        await Future<void>.delayed(Duration.zero);
-
-        // Re-pump with the same bloc instance
+        // Re-pump with the same bloc instance and same version.
         tester.pumpComponent(
           BlocInherited<TestCubit>(
             bloc: cubit,
+            stateVersion: 0,
             child: const ConsumerComponent(),
           ),
         );
 
         // The component tree should not be marked as needing notification
-        // because the bloc instance is the same (even though state changed)
-        expect(find.text('Cubit state: 1'), findsOneComponent);
+        // because both the bloc instance and stateVersion are unchanged.
+        expect(find.text('Cubit state: 0'), findsOneComponent);
       },
     );
 
@@ -152,6 +157,7 @@ void main() {
       tester.pumpComponent(
         BlocInherited<TestCubit>(
           bloc: cubit1,
+          stateVersion: 0,
           child: const div([ConsumerComponent()]),
         ),
       );

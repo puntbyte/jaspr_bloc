@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:jaspr/jaspr.dart';
 
@@ -117,6 +119,8 @@ class BlocProvider<T extends BlocBase<Object?>> extends StatefulComponent {
 class _BlocProviderState<T extends BlocBase<Object?>>
     extends State<BlocProvider<T>> {
   late T _bloc;
+  int _stateVersion = 0;
+  StreamSubscription<Object?>? _stateSubscription;
 
   @override
   void initState() {
@@ -126,10 +130,14 @@ class _BlocProviderState<T extends BlocBase<Object?>>
     } else {
       _bloc = component._create!(context);
     }
+    _stateSubscription = _bloc.stream.listen((_) {
+      setState(() => _stateVersion++);
+    });
   }
 
   @override
   void dispose() {
+    _stateSubscription?.cancel();
     if (component._manageLifecycle) {
       _bloc.close();
     }
@@ -143,6 +151,10 @@ class _BlocProviderState<T extends BlocBase<Object?>>
       'BlocProvider requires a child component when used standalone. '
       'Provide a child argument or use BlocProvider inside MultiBlocProvider.',
     );
-    return BlocInherited<T>(bloc: _bloc, child: component.child!);
+    return BlocInherited<T>(
+      bloc: _bloc,
+      stateVersion: _stateVersion,
+      child: component.child!,
+    );
   }
 }

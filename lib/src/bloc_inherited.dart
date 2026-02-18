@@ -12,11 +12,25 @@ class BlocInherited<T extends BlocBase<Object?>> extends InheritedComponent {
   /// The bloc instance provided to descendant components.
   final T bloc;
 
+  /// A version counter that increments each time the bloc emits a new state.
+  ///
+  /// Managed by [BlocProvider]. When this value changes,
+  /// [updateShouldNotify] returns `true`, causing all components that
+  /// subscribed via [of] to rebuild. This enables [context.watch] semantics.
+  final int stateVersion;
+
   /// Creates a [BlocInherited] component.
   ///
   /// The [bloc] parameter is required and holds the bloc instance.
+  /// The [stateVersion] parameter is required and must be incremented by
+  /// [BlocProvider] each time the bloc emits a new state.
   /// The [child] parameter is required and represents the descendant tree.
-  const BlocInherited({required this.bloc, required super.child, super.key});
+  const BlocInherited({
+    required this.bloc,
+    required this.stateVersion,
+    required super.child,
+    super.key,
+  });
 
   /// Retrieves the nearest [BlocInherited] ancestor of type [T] from the
   /// component tree, subscribing to rebuild notifications.
@@ -62,6 +76,7 @@ class BlocInherited<T extends BlocBase<Object?>> extends InheritedComponent {
 
   @override
   bool updateShouldNotify(covariant BlocInherited<T> oldComponent) {
-    return bloc != oldComponent.bloc;
+    return bloc != oldComponent.bloc ||
+        stateVersion != oldComponent.stateVersion;
   }
 }
