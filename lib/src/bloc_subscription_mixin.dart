@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:jaspr/jaspr.dart';
 
+import 'jaspr_bloc_config.dart';
+
 /// A mixin for [State] that manages a single [StreamSubscription] to a [StateStreamable].
 ///
 /// This mixin provides lifecycle management for stream subscriptions in Jaspr
@@ -56,6 +58,9 @@ mixin BlocSubscriptionMixin<T extends StatefulComponent> on State<T> {
     required void Function(S state) onState,
     bool Function(S previous, S current)? filter,
   }) {
+    if (!isClientEnvironment) {
+      return;
+    }
     S previous = bloc.state;
     _subscription = bloc.stream.listen((state) {
       if (filter == null || filter(previous, state)) {

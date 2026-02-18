@@ -3,6 +3,8 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_bloc/jaspr_bloc.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 
+import '../helpers/client_mode.dart';
+
 // ---------------------------------------------------------------------------
 // Test doubles
 // ---------------------------------------------------------------------------
@@ -76,6 +78,9 @@ class ReadingComponent extends StatelessComponent {
 // ---------------------------------------------------------------------------
 
 void main() {
+  setUp(() => setIsClientForTesting(true));
+  tearDown(() => resetIsClientForTesting());
+
   group('BuildContext.watch<T>()', () {
     group('subscribes to state changes', () {
       testComponents('component rebuilds when watched bloc emits new state', (

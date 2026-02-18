@@ -3,6 +3,8 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_bloc/jaspr_bloc.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 
+import '../helpers/client_mode.dart';
+
 // ---------------------------------------------------------------------------
 // Test doubles
 // ---------------------------------------------------------------------------
@@ -36,6 +38,9 @@ class CounterCubit extends Cubit<int> {
 // ---------------------------------------------------------------------------
 
 void main() {
+  setUp(() => setIsClientForTesting(true));
+  tearDown(() => resetIsClientForTesting());
+
   group('BlocSelector', () {
     group('initial render', () {
       testComponents('renders the initial selected value', (tester) async {

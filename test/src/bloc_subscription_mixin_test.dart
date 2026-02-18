@@ -3,6 +3,8 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_bloc/jaspr_bloc.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 
+import '../helpers/client_mode.dart';
+
 /// A simple test cubit that emits integers.
 class TestCubit extends Cubit<int> {
   TestCubit() : super(0);
@@ -55,6 +57,9 @@ class _TestSubscriptionComponentState extends State<TestSubscriptionComponent>
 }
 
 void main() {
+  setUp(() => setIsClientForTesting(true));
+  tearDown(() => resetIsClientForTesting());
+
   group('BlocSubscriptionMixin', () {
     late TestCubit cubit;
 

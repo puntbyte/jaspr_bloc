@@ -3,6 +3,8 @@ import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_bloc/jaspr_bloc.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 
+import '../helpers/client_mode.dart';
+
 // ---------------------------------------------------------------------------
 // Test doubles
 // ---------------------------------------------------------------------------
@@ -47,6 +49,9 @@ class _BuildCountComponentState extends State<BuildCountComponent> {
 // ---------------------------------------------------------------------------
 
 void main() {
+  setUp(() => setIsClientForTesting(true));
+  tearDown(() => resetIsClientForTesting());
+
   group('MultiBlocListener', () {
     group('listener invocation', () {
       testComponents('each listener fires independently on its bloc change', (

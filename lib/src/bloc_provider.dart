@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:jaspr/jaspr.dart';
 
 import 'bloc_inherited.dart';
+import 'jaspr_bloc_config.dart';
 
 /// Signature for a function that creates a [BlocBase] instance from a
 /// [BuildContext].
@@ -130,9 +131,11 @@ class _BlocProviderState<T extends BlocBase<Object?>>
     } else {
       _bloc = component._create!(context);
     }
-    _stateSubscription = _bloc.stream.listen((_) {
-      setState(() => _stateVersion++);
-    });
+    if (isClientEnvironment) {
+      _stateSubscription = _bloc.stream.listen((_) {
+        setState(() => _stateVersion++);
+      });
+    }
   }
 
   @override

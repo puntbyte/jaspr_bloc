@@ -6,6 +6,7 @@ import 'package:jaspr/jaspr.dart';
 import 'bloc_builder.dart';
 import 'bloc_listener.dart';
 import 'bloc_provider.dart';
+import 'jaspr_bloc_config.dart';
 
 /// A Jaspr component that combines [BlocBuilder] and [BlocListener] into a
 /// single component backed by a **single** stream subscription.
@@ -100,7 +101,9 @@ class _BlocConsumerState<B extends BlocBase<S>, S>
     final B bloc = component.bloc ?? BlocProvider.of<B>(context);
     _state = bloc.state;
     _previous = bloc.state;
-    _subscription = bloc.stream.listen(_onState);
+    if (isClientEnvironment) {
+      _subscription = bloc.stream.listen(_onState);
+    }
   }
 
   void _onState(S state) {
