@@ -23,6 +23,11 @@ in @../trt-ai-agent-development-system/projects/jaspr_bloc/stories.md
 Follow `Coding Rules`
 in @../trt-ai-agent-development-system/docs/coding/dart-sdk-coding-rules.md
 
+## Agent Tools
+
+Follow the `Rules` in the `TRT Agent Tools`.
+@../trt-ai-agent-development-system/docs/tools/trt-agent-tools.md
+
 ## Markdown Writing Style
 Follow `Markdown Writing Style` in @../trt-ai-agent-development-system/docs/coding/markdown-writing-style.md
 
