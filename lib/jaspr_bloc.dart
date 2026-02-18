@@ -19,7 +19,10 @@ export 'src/repository_provider.dart';
 
 // Export reactive UI components
 export 'src/bloc_builder.dart';
+export 'src/bloc_consumer.dart';
 export 'src/bloc_listener.dart';
+export 'src/bloc_listener_base.dart';
+export 'src/multi_bloc_listener.dart';
 
 // Export mixin for subscription lifecycle management
 export 'src/bloc_subscription_mixin.dart';

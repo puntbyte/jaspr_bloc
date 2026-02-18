@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:jaspr/jaspr.dart';
 
+import 'bloc_listener_base.dart';
 import 'bloc_provider.dart';
 import 'bloc_subscription_mixin.dart';
 
@@ -40,7 +41,7 @@ typedef BlocListenerCondition<S> = bool Function(S previous, S current);
 ///   child: LoginForm(),
 /// )
 /// ```
-class BlocListener<B extends BlocBase<S>, S> extends StatefulComponent {
+class BlocListener<B extends BlocBase<S>, S> extends BlocListenerBase {
   /// Creates a [BlocListener].
   ///
   /// Both [listener] and [child] are required.
@@ -85,6 +86,7 @@ class BlocListener<B extends BlocBase<S>, S> extends StatefulComponent {
   ///
   /// Used internally by [MultiBlocListener] to compose a nested listener tree.
   /// Do not call this method directly.
+  @override
   BlocListener<B, S> copyWithChild(Component child) {
     return BlocListener<B, S>(
       listener: listener,
