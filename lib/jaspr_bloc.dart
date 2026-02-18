@@ -22,6 +22,7 @@ export 'src/bloc_builder.dart';
 export 'src/bloc_consumer.dart';
 export 'src/bloc_listener.dart';
 export 'src/bloc_listener_base.dart';
+export 'src/bloc_selector.dart';
 export 'src/multi_bloc_listener.dart';
 
 // Export mixin for subscription lifecycle management
