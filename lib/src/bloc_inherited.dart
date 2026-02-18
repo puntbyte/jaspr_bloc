@@ -19,10 +19,11 @@ class BlocInherited<T extends BlocBase<Object?>> extends InheritedComponent {
   const BlocInherited({required this.bloc, required super.child, super.key});
 
   /// Retrieves the nearest [BlocInherited] ancestor of type [T] from the
-  /// component tree.
+  /// component tree, subscribing to rebuild notifications.
   ///
   /// This method uses [dependOnInheritedComponentOfExactType] to look up
-  /// the bloc and will throw an assertion error if no provider is found.
+  /// the bloc and registers the caller as a dependent so it rebuilds when
+  /// the bloc instance changes.
   ///
   /// The [context] parameter is the build context from which to start the
   /// lookup.
@@ -36,6 +37,27 @@ class BlocInherited<T extends BlocBase<Object?>> extends InheritedComponent {
         .dependOnInheritedComponentOfExactType<BlocInherited<T>>();
     assert(inherited != null, 'No BlocProvider<$T> found in context');
     return inherited!.bloc;
+  }
+
+  /// Retrieves the nearest [BlocInherited] ancestor of type [T] from the
+  /// component tree without subscribing to rebuild notifications.
+  ///
+  /// This method uses [getElementForInheritedComponentOfExactType] to look
+  /// up the bloc without registering the caller as a dependent. The calling
+  /// component will NOT rebuild when the bloc instance changes.
+  ///
+  /// The [context] parameter is the build context from which to start the
+  /// lookup.
+  ///
+  /// Returns the bloc instance of type [T].
+  ///
+  /// Throws an [AssertionError] if no [BlocInherited<T>] is found in the
+  /// component tree.
+  static T readOf<T extends BlocBase<Object?>>(BuildContext context) {
+    final element = context
+        .getElementForInheritedComponentOfExactType<BlocInherited<T>>();
+    assert(element != null, 'No BlocProvider<$T> found in context');
+    return (element!.component as BlocInherited<T>).bloc;
   }
 
   @override
