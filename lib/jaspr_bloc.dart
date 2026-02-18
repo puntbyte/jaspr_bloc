@@ -13,6 +13,9 @@ export 'src/build_context_extensions.dart';
 
 // Export dependency injection components
 export 'src/bloc_provider.dart';
+export 'src/multi_bloc_provider.dart';
+export 'src/multi_repository_provider.dart';
+export 'src/repository_provider.dart';
 
 // Export mixin for subscription lifecycle management
 export 'src/bloc_subscription_mixin.dart';

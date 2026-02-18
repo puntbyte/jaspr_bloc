@@ -50,29 +50,47 @@ class BlocProvider<T extends BlocBase<Object?>> extends StatefulComponent {
   final bool _manageLifecycle;
 
   /// The child component that will have access to the provided bloc.
-  final Component child;
+  ///
+  /// Required when used as a standalone provider. When used inside
+  /// [MultiBlocProvider], omit this — the child is provided automatically.
+  final Component? child;
 
   /// Creates a [BlocProvider] that creates and manages the lifecycle of [T].
   ///
   /// The [create] function is called once when the component is initialized
   /// to create the bloc instance. The bloc is automatically closed when
   /// this component is disposed.
-  const BlocProvider({
-    required BlocCreator<T> create,
-    required this.child,
-    super.key,
-  }) : _create = create,
-       _value = null,
-       _manageLifecycle = true;
+  ///
+  /// When used standalone, [child] is required. When used inside
+  /// [MultiBlocProvider], [child] may be omitted.
+  const BlocProvider({required BlocCreator<T> create, this.child, super.key})
+    : _create = create,
+      _value = null,
+      _manageLifecycle = true;
 
   /// Creates a [BlocProvider] that provides an existing [value] bloc.
   ///
   /// The provided bloc is NOT closed when this component is disposed.
   /// Use this constructor when the bloc's lifecycle is managed externally.
-  const BlocProvider.value({required T value, required this.child, super.key})
+  ///
+  /// When used standalone, [child] is required. When used inside
+  /// [MultiBlocProvider], [child] may be omitted.
+  const BlocProvider.value({required T value, this.child, super.key})
     : _value = value,
       _create = null,
       _manageLifecycle = false;
+
+  /// Creates a copy of this provider with [child] as the child component.
+  ///
+  /// Used internally by [MultiBlocProvider] to compose a nested provider tree.
+  /// Do not call this method directly.
+  BlocProvider<T> copyWithChild(Component child) {
+    if (_manageLifecycle) {
+      return BlocProvider<T>(create: _create!, child: child, key: key);
+    } else {
+      return BlocProvider<T>.value(value: _value!, child: child, key: key);
+    }
+  }
 
   /// Retrieves the nearest [BlocProvider<T>] ancestor's bloc from [context].
   ///
@@ -120,6 +138,11 @@ class _BlocProviderState<T extends BlocBase<Object?>>
 
   @override
   Component build(BuildContext context) {
-    return BlocInherited<T>(bloc: _bloc, child: component.child);
+    assert(
+      component.child != null,
+      'BlocProvider requires a child component when used standalone. '
+      'Provide a child argument or use BlocProvider inside MultiBlocProvider.',
+    );
+    return BlocInherited<T>(bloc: _bloc, child: component.child!);
   }
 }
