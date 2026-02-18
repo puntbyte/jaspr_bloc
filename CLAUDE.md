@@ -19,9 +19,9 @@ here @../trt-ai-agent-development-system/docs/research/jaspr_bloc/index.md
 Follow `Managing Epics and Stories` 
 in @../trt-ai-agent-development-system/projects/jaspr_bloc/stories.md
 
-## Coding Style
-Follow `Coding Style`
-in @../trt-ai-agent-development-system/docs/coding/dart-sdk-coding-style.md
+## Coding Rules
+Follow `Coding Rules`
+in @../trt-ai-agent-development-system/docs/coding/dart-sdk-coding-rules.md
 
 ## Markdown Writing Style
 Follow `Markdown Writing Style` in @../trt-ai-agent-development-system/docs/coding/markdown-writing-style.md
