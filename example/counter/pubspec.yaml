@@ -1,0 +1,21 @@
+name: counter
+description: Counter example app demonstrating jaspr_bloc usage.
+version: 0.0.1
+
+environment:
+  sdk: ^3.10.8
+
+dependencies:
+  bloc: ^9.0.0
+  jaspr: ^0.22.0
+  jaspr_bloc:
+    path: ../..
+
+dev_dependencies:
+  build_runner: ^2.4.0
+  jaspr_builder: ^0.22.0
+  jaspr_lints: ^0.6.0
+  lints: ^5.0.0
+
+jaspr:
+  mode: static

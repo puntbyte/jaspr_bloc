@@ -1,0 +1,21 @@
+include: package:lints/recommended.yaml
+
+analyzer:
+  plugins:
+    - jaspr_lints
+
+linter:
+  rules:
+    - always_declare_return_types
+    - avoid_print
+    - prefer_const_constructors
+    - prefer_const_declarations
+    - prefer_final_fields
+    - unnecessary_this
+
+custom_lint:
+  rules:
+    - prefer_html_methods
+    - sort_children_properties_last
+    - styles_ordering
+    - prefer_styles_getter
