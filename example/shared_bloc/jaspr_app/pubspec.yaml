@@ -1,0 +1,25 @@
+name: jaspr_app
+description: >
+  Jaspr web app for the shared_bloc example. Uses jaspr_bloc for
+  reactive UI and imports CounterCubit from the shared common_blocs
+  package.
+version: 0.0.1
+
+environment:
+  sdk: ^3.10.8
+
+dependencies:
+  common_blocs:
+    path: ../common_blocs
+  jaspr: ^0.22.0
+  jaspr_bloc:
+    path: ../../..
+
+dev_dependencies:
+  build_runner: ^2.4.0
+  jaspr_builder: ^0.22.0
+  jaspr_lints: ^0.6.0
+  lints: ^5.0.0
+
+jaspr:
+  mode: static

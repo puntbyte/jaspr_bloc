@@ -1,0 +1,14 @@
+name: common_blocs
+description: >
+  Shared bloc package containing pure-Dart cubits and blocs
+  used by both the Flutter app and the Jaspr web app.
+version: 0.1.0
+
+environment:
+  sdk: ^3.10.8
+
+dependencies:
+  bloc: ^9.0.0
+
+dev_dependencies:
+  lints: ^5.0.0
