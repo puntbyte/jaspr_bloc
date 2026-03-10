@@ -1,6 +1,7 @@
 name: counter
 description: Counter example app demonstrating jaspr_bloc usage.
 version: 0.0.1
+publish_to: none
 
 environment:
   sdk: ^3.10.8

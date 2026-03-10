@@ -4,6 +4,7 @@ description: >
   reactive UI and imports CounterCubit from the shared common_blocs
   package.
 version: 0.0.1
+publish_to: none
 
 environment:
   sdk: ^3.10.8
