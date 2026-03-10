@@ -159,6 +159,26 @@ void main() {
       },
     );
 
+    testComponents('value constructor providers are accessible from child', (
+      tester,
+    ) async {
+      const userRepo = UserRepository(name: 'value-user');
+      const authRepo = AuthRepository(name: 'value-auth');
+
+      tester.pumpComponent(
+        const MultiRepositoryProvider(
+          providers: [
+            RepositoryProvider<UserRepository>.value(value: userRepo),
+            RepositoryProvider<AuthRepository>.value(value: authRepo),
+          ],
+          child: TwoRepoReaderComponent(),
+        ),
+      );
+
+      expect(find.text('user:value-user'), findsOneComponent);
+      expect(find.text('auth:value-auth'), findsOneComponent);
+    });
+
     testComponents('provider ordering does not affect access', (tester) async {
       // Reversed order — both still accessible regardless of position.
       tester.pumpComponent(

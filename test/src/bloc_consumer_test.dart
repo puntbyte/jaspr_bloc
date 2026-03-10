@@ -16,6 +16,48 @@ class TestCubit extends Cubit<int> {
   void increment() => emit(state + 1);
 }
 
+/// A wrapper that can conditionally show or hide its child.
+///
+/// Hiding the child triggers the dispose lifecycle on the subtree.
+class ConditionalWrapper extends StatefulComponent {
+  final Component child;
+  final void Function(ConditionalWrapperState state) onCreate;
+
+  const ConditionalWrapper({
+    required this.child,
+    required this.onCreate,
+    super.key,
+  });
+
+  @override
+  State<ConditionalWrapper> createState() => ConditionalWrapperState();
+}
+
+class ConditionalWrapperState extends State<ConditionalWrapper> {
+  bool _visible = true;
+
+  /// Hides the child, triggering dispose on its subtree.
+  void hide() {
+    setState(() {
+      _visible = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    component.onCreate(this);
+  }
+
+  @override
+  Component build(BuildContext context) {
+    if (_visible) {
+      return component.child;
+    }
+    return const div([]);
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
@@ -270,6 +312,41 @@ void main() {
           expect(builderCallCount, equals(2));
         },
       );
+    });
+
+    group('dispose', () {
+      testComponents('cancels subscription on dispose without errors', (
+        tester,
+      ) async {
+        final cubit = TestCubit();
+        addTearDown(cubit.close);
+        ConditionalWrapperState? wrapperState;
+
+        tester.pumpComponent(
+          ConditionalWrapper(
+            onCreate: (state) => wrapperState = state,
+            child: BlocProvider<TestCubit>.value(
+              value: cubit,
+              child: BlocConsumer<TestCubit, int>(
+                listener: (context, state) {},
+                builder: (context, state) {
+                  return div([Component.text('state:$state')]);
+                },
+              ),
+            ),
+          ),
+        );
+
+        expect(find.text('state:0'), findsOneComponent);
+
+        // Dispose the BlocConsumer by hiding its parent.
+        wrapperState!.hide();
+        await tester.pump();
+
+        // After dispose, emitting on the cubit should not throw.
+        cubit.increment();
+        await tester.pump();
+      });
     });
 
     group('explicit bloc parameter', () {
