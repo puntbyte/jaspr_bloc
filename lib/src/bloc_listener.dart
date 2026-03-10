@@ -20,7 +20,7 @@ typedef BlocListenerCondition<S> = bool Function(S previous, S current);
 ///
 /// [BlocListener] subscribes to the bloc's [Stream] in `initState`. On each
 /// new state (filtered by the optional [listenWhen] predicate) the [listener]
-/// is called with the current [BuildContext] and the new state.
+/// is called with the current `BuildContext` and the new state.
 ///
 /// The [listener] is **not** called for the bloc's initial state — only for
 /// subsequent emissions.
@@ -46,7 +46,7 @@ class BlocListener<B extends BlocBase<S>, S> extends BlocListenerBase {
   ///
   /// Both [listener] and [child] are required.
   ///
-  /// If [bloc] is omitted the nearest ancestor [BlocProvider<B>] is used.
+  /// If [bloc] is omitted the nearest ancestor [BlocProvider] is used.
   ///
   /// The optional [listenWhen] predicate receives the previous and current
   /// state and must return `true` for the [listener] to be called.
@@ -71,7 +71,7 @@ class BlocListener<B extends BlocBase<S>, S> extends BlocListenerBase {
 
   /// Called on each state change that passes [listenWhen].
   ///
-  /// Receives the [BuildContext] and the new state. Use this callback to
+  /// Receives the `BuildContext` and the new state. Use this callback to
   /// trigger side effects such as navigation or notifications.
   final BlocWidgetListener<S> listener;
 

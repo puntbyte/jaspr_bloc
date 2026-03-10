@@ -16,7 +16,7 @@ typedef BlocWidgetSelector<S, T> = T Function(S state);
 /// value [T] changes according to `==` equality. This prevents unnecessary
 /// rebuilds when unrelated parts of the state are updated.
 ///
-/// The [builder] callback receives the [BuildContext] and the selected value
+/// The [builder] callback receives the `BuildContext` and the selected value
 /// [T], not the full state [S].
 ///
 /// By default the nearest ancestor [BlocProvider] supplies the bloc. You may
@@ -58,7 +58,7 @@ class BlocSelector<B extends BlocBase<S>, S, T> extends StatefulComponent {
 
   /// Called every time the component needs to rebuild.
   ///
-  /// Receives the [BuildContext] and the current selected value [T].
+  /// Receives the `BuildContext` and the current selected value [T].
   final BlocWidgetBuilder<T> builder;
 
   @override

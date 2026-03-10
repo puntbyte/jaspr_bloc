@@ -3,18 +3,18 @@ import 'package:jaspr/jaspr.dart';
 import 'repository_inherited.dart';
 
 /// Signature for a function that creates a repository instance from a
-/// [BuildContext].
+/// `BuildContext`.
 typedef RepositoryCreator<T> = T Function(BuildContext context);
 
 /// A Jaspr component that provides a repository or service instance to its
 /// descendants via dependency injection.
 ///
-/// [RepositoryProvider] uses [InheritedComponent] to make any non-bloc
+/// [RepositoryProvider] uses `InheritedComponent` to make any non-bloc
 /// dependency (repositories, services, data sources) accessible to all
 /// descendant components in the component tree.
 ///
 /// Unlike [BlocProvider], [RepositoryProvider] does NOT manage any lifecycle
-/// (no `.close()` call on dispose), since repositories are not [BlocBase].
+/// (no `.close()` call on dispose), since repositories are not `BlocBase`.
 ///
 /// Use the default constructor when you want [RepositoryProvider] to create
 /// the repository instance:

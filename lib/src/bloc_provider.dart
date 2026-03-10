@@ -6,14 +6,14 @@ import 'package:jaspr/jaspr.dart';
 import 'bloc_inherited.dart';
 import 'jaspr_bloc_config.dart';
 
-/// Signature for a function that creates a [BlocBase] instance from a
-/// [BuildContext].
+/// Signature for a function that creates a `BlocBase` instance from a
+/// `BuildContext`.
 typedef BlocCreator<T> = T Function(BuildContext context);
 
-/// A Jaspr component that provides a [BlocBase] instance to its descendants
+/// A Jaspr component that provides a `BlocBase` instance to its descendants
 /// via dependency injection.
 ///
-/// [BlocProvider] uses [InheritedComponent] to make a bloc or cubit accessible
+/// [BlocProvider] uses `InheritedComponent` to make a bloc or cubit accessible
 /// to all descendant components in the component tree.
 ///
 /// Use the default constructor when you want [BlocProvider] to create and
@@ -42,7 +42,7 @@ typedef BlocCreator<T> = T Function(BuildContext context);
 /// final cubit = BlocProvider.of<CounterCubit>(context);
 /// ```
 ///
-/// Or via the [BuildContext] extension:
+/// Or via the `BuildContext` extension:
 ///
 /// ```dart
 /// final cubit = context.read<CounterCubit>();

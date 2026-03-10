@@ -4,7 +4,7 @@ import 'package:jaspr/jaspr.dart';
 import 'bloc_provider.dart';
 import 'bloc_subscription_mixin.dart';
 
-/// Signature for a function that builds a [Component] from a [BuildContext]
+/// Signature for a function that builds a `Component` from a `BuildContext`
 /// and a state [S].
 typedef BlocWidgetBuilder<S> =
     Component Function(BuildContext context, S state);
@@ -15,11 +15,11 @@ typedef BlocWidgetBuilder<S> =
 /// Return `true` to allow the rebuild, `false` to prevent it.
 typedef BlocBuilderCondition<S> = bool Function(S previous, S current);
 
-/// A Jaspr component that rebuilds its UI whenever a [BlocBase] emits a new
+/// A Jaspr component that rebuilds its UI whenever a `BlocBase` emits a new
 /// state.
 ///
-/// [BlocBuilder] subscribes to the bloc's [Stream] in `initState` and calls
-/// [setState] to trigger a rebuild when a new state is received. The [builder]
+/// [BlocBuilder] subscribes to the bloc's `Stream` in `initState` and calls
+/// `setState` to trigger a rebuild when a new state is received. The [builder]
 /// callback is invoked with the latest accepted state.
 ///
 /// By default the nearest ancestor [BlocProvider] supplies the bloc. You may
@@ -41,7 +41,7 @@ typedef BlocBuilderCondition<S> = bool Function(S previous, S current);
 class BlocBuilder<B extends BlocBase<S>, S> extends StatefulComponent {
   /// Creates a [BlocBuilder].
   ///
-  /// The [builder] callback is required and is called with the [BuildContext]
+  /// The [builder] callback is required and is called with the `BuildContext`
   /// and the current state whenever a rebuild is needed.
   ///
   /// If [bloc] is omitted the nearest ancestor [BlocProvider<B>] is used.
@@ -63,7 +63,7 @@ class BlocBuilder<B extends BlocBase<S>, S> extends StatefulComponent {
 
   /// Called every time the component needs to rebuild.
   ///
-  /// Receives the [BuildContext] and the current accepted state.
+  /// Receives the `BuildContext` and the current accepted state.
   final BlocWidgetBuilder<S> builder;
 
   /// An optional predicate that controls whether a state change triggers a

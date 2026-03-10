@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:jaspr/jaspr.dart';
 
-/// Internal [InheritedComponent] that holds a [BlocBase] instance.
+/// Internal `InheritedComponent` that holds a `BlocBase` instance.
 ///
 /// This component is used internally by [BlocProvider] to provide bloc
 /// instances down the component tree using Jaspr's dependency mechanism.
@@ -16,7 +16,7 @@ class BlocInherited<T extends BlocBase<Object?>> extends InheritedComponent {
   ///
   /// Managed by [BlocProvider]. When this value changes,
   /// [updateShouldNotify] returns `true`, causing all components that
-  /// subscribed via [of] to rebuild. This enables [context.watch] semantics.
+  /// subscribed via [of] to rebuild. This enables `context.watch` semantics.
   final int stateVersion;
 
   /// Creates a [BlocInherited] component.
@@ -35,7 +35,7 @@ class BlocInherited<T extends BlocBase<Object?>> extends InheritedComponent {
   /// Retrieves the nearest [BlocInherited] ancestor of type [T] from the
   /// component tree, subscribing to rebuild notifications.
   ///
-  /// This method uses [dependOnInheritedComponentOfExactType] to look up
+  /// This method uses `dependOnInheritedComponentOfExactType` to look up
   /// the bloc and registers the caller as a dependent so it rebuilds when
   /// the bloc instance changes.
   ///
@@ -56,7 +56,7 @@ class BlocInherited<T extends BlocBase<Object?>> extends InheritedComponent {
   /// Retrieves the nearest [BlocInherited] ancestor of type [T] from the
   /// component tree without subscribing to rebuild notifications.
   ///
-  /// This method uses [getElementForInheritedComponentOfExactType] to look
+  /// This method uses `getElementForInheritedComponentOfExactType` to look
   /// up the bloc without registering the caller as a dependent. The calling
   /// component will NOT rebuild when the bloc instance changes.
   ///

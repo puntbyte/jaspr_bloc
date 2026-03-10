@@ -1,6 +1,6 @@
 import 'package:jaspr/jaspr.dart';
 
-/// Internal [InheritedComponent] that holds a repository instance of type [T].
+/// Internal `InheritedComponent` that holds a repository instance of type [T].
 ///
 /// This component is used internally by [RepositoryProvider] to provide
 /// repository instances down the component tree using Jaspr's dependency

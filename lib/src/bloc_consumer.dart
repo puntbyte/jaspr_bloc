@@ -62,7 +62,7 @@ class BlocConsumer<B extends BlocBase<S>, S> extends StatefulComponent {
 
   /// Called every time the component needs to rebuild.
   ///
-  /// Receives the [BuildContext] and the current accepted state.
+  /// Receives the `BuildContext` and the current accepted state.
   final BlocWidgetBuilder<S> builder;
 
   /// An optional predicate that controls whether a state change triggers a
@@ -74,7 +74,7 @@ class BlocConsumer<B extends BlocBase<S>, S> extends StatefulComponent {
 
   /// Called on each state change that passes [listenWhen].
   ///
-  /// Receives the [BuildContext] and the new state. Use this callback to
+  /// Receives the `BuildContext` and the new state. Use this callback to
   /// trigger side effects such as navigation or notifications.
   final BlocWidgetListener<S> listener;
 

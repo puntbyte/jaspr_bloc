@@ -5,7 +5,7 @@ import 'package:jaspr/jaspr.dart';
 
 import 'jaspr_bloc_config.dart';
 
-/// A mixin for [State] that manages a single [StreamSubscription] to a [StateStreamable].
+/// A mixin for `State` that manages a single `StreamSubscription` to a `StateStreamable`.
 ///
 /// This mixin provides lifecycle management for stream subscriptions in Jaspr
 /// components, automatically canceling the subscription when the component is
@@ -42,7 +42,7 @@ import 'jaspr_bloc_config.dart';
 mixin BlocSubscriptionMixin<T extends StatefulComponent> on State<T> {
   StreamSubscription<dynamic>? _subscription;
 
-  /// Subscribes to a [StateStreamable] and calls [onState] for each new state.
+  /// Subscribes to a `StateStreamable` and calls [onState] for each new state.
   ///
   /// The [bloc] parameter is the state streamable to subscribe to.
   ///

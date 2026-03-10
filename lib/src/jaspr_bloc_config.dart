@@ -2,7 +2,7 @@ import 'package:jaspr/jaspr.dart';
 
 /// Whether stream subscriptions should be activated in the current environment.
 ///
-/// Defaults to [kIsWeb] — `true` in the browser, `false` on the server during
+/// Defaults to `kIsWeb` — `true` in the browser, `false` on the server during
 /// SSR. When `false`, [BlocProvider], [BlocBuilder], [BlocListener],
 /// [BlocConsumer], and [BlocSelector] skip stream subscription creation so
 /// that server-side rendering (SSR) remains purely synchronous.
@@ -28,7 +28,7 @@ bool get isClientEnvironment => _isClient;
 // ignore: avoid_positional_boolean_parameters
 void setIsClientForTesting(bool value) => _isClient = value;
 
-/// Resets [isClientEnvironment] to the default value ([kIsWeb]).
+/// Resets [isClientEnvironment] to the default value (`kIsWeb`).
 ///
 /// Call this in a `tearDown` callback after using [setIsClientForTesting].
 void resetIsClientForTesting() => _isClient = kIsWeb;

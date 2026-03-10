@@ -4,7 +4,7 @@ import 'package:jaspr/jaspr.dart';
 import 'bloc_inherited.dart';
 import 'bloc_provider.dart';
 
-/// Extensions on [BuildContext] for ergonomic bloc access.
+/// Extensions on `BuildContext` for ergonomic bloc access.
 ///
 /// These extensions mirror the API provided by `flutter_bloc`, enabling
 /// familiar patterns for developers working across Flutter and Jaspr.
