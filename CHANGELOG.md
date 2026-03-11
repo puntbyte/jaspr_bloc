@@ -9,7 +9,7 @@ Version numbers are aligned with the `bloc` ecosystem convention:
 major versions track breaking changes, minor versions track new components,
 and patch versions track bug fixes and documentation updates.
 
-## [0.1.0] - 2026-03-10
+## [1.0.0] - 2026-03-11
 
 ### Added
 
