@@ -13,6 +13,7 @@ and patch versions track bug fixes and documentation updates.
 
 ### Fixed
 
+- Correct repository URL in `pubspec.yaml` to point to the right GitHub repository.
 - Add top-level `example/example.dart` so pub.dev recognizes the example correctly.
 - Hide undocumented abstract protocol types (`BlocEventSink`, `Closable`, `Emittable`,
   `EmittableStateStreamableSource`, `Emitter`) from the `package:bloc` re-export so all
