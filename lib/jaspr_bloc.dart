@@ -5,8 +5,16 @@
 /// way as Flutter apps.
 library;
 
-// Export bloc package for convenience
-export 'package:bloc/bloc.dart';
+// Export bloc package for convenience, hiding abstract protocol types whose
+// constructors are undocumented in the upstream bloc package. Users who need
+// these types directly can import package:bloc/bloc.dart in their own code.
+export 'package:bloc/bloc.dart'
+    hide
+        BlocEventSink,
+        Closable,
+        Emittable,
+        EmittableStateStreamableSource,
+        Emitter;
 
 // Export context extensions for ergonomic bloc access
 export 'src/build_context_extensions.dart';

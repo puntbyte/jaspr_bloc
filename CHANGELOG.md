@@ -9,6 +9,15 @@ Version numbers are aligned with the `bloc` ecosystem convention:
 major versions track breaking changes, minor versions track new components,
 and patch versions track bug fixes and documentation updates.
 
+## [1.0.1] - 2026-03-11
+
+### Fixed
+
+- Add top-level `example/example.dart` so pub.dev recognizes the example correctly.
+- Hide undocumented abstract protocol types (`BlocEventSink`, `Closable`, `Emittable`,
+  `EmittableStateStreamableSource`, `Emitter`) from the `package:bloc` re-export so all
+  public API elements in jaspr_bloc have dartdoc coverage.
+
 ## [1.0.0] - 2026-03-11
 
 ### Added
