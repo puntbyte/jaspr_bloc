@@ -275,7 +275,7 @@ class CounterControls extends StatelessComponent {
 }
 ```
 
-See [Client Component Isolation](./docs/client-component-isolation.md) for the full pattern and
+See [Client Component Isolation](./doc/client-component-isolation.md) for the full pattern and
 explanation.
 
 ## flutter_bloc vs jaspr_bloc
@@ -322,7 +322,7 @@ void main() {
 
 ## Documentation
 
-- [Client Component Isolation](./docs/client-component-isolation.md) —
+- [Client Component Isolation](./doc/client-component-isolation.md) —
   Sharing blocs across `@client` island trees with `BlocProvider.value`.
-- [Integration Testing](./docs/integration-testing.md) —
+- [Integration Testing](./doc/integration-testing.md) —
   Writing integration tests with `jaspr_test`.

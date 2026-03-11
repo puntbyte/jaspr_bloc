@@ -65,7 +65,7 @@ and patch versions track bug fixes and documentation updates.
 **Documentation**
 
 - Full dartdoc comments on all public APIs with usage examples
-- `docs/client-component-isolation.md` — guide for sharing blocs across `@client` island
+- `doc/client-component-isolation.md` — guide for sharing blocs across `@client` island
   boundaries using the `BlocProvider.value` global container pattern
 - Comprehensive README with quick start, per-component code examples, SSR guidance, and a
   `flutter_bloc` vs `jaspr_bloc` comparison table
