@@ -1,2 +1,2 @@
-export 'package:jaspr_bloc/src/jaspr_bloc_config.dart'
+export 'package:jaspr_bloc/testing.dart'
     show resetIsClientForTesting, setIsClientForTesting;

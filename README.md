@@ -301,7 +301,28 @@ The Bloc and Cubit classes live in `package:bloc` and are shared by both librari
 your business logic in a separate `common_blocs` package and import it unchanged in both Flutter
 and Jaspr apps. Only the UI layer differs.
 
+## Testing
+
+When writing Dart VM tests for components that use `BlocBuilder`, `BlocListener`, or other
+reactive jaspr_bloc components, import `package:jaspr_bloc/testing.dart` and call
+`setIsClientForTesting(true)` in `setUp` to enable stream subscriptions outside the browser:
+
+```dart
+import 'package:jaspr_bloc/testing.dart';
+
+void main() {
+  setUp(() => setIsClientForTesting(true));
+  tearDown(() => resetIsClientForTesting());
+
+  test('counter increments', () {
+    // BlocBuilder and friends now subscribe to streams in the Dart VM.
+  });
+}
+```
+
 ## Documentation
 
 - [Client Component Isolation](./docs/client-component-isolation.md) —
   Sharing blocs across `@client` island trees with `BlocProvider.value`.
+- [Integration Testing](./docs/integration-testing.md) —
+  Writing integration tests with `jaspr_test`.
