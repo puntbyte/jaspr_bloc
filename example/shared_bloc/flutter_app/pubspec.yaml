@@ -33,8 +33,8 @@ dependencies:
 
   common_blocs:
     path: ../common_blocs
-  cupertino_icons: ^1.0.8
-  flutter_bloc: ^9.0.0
+  cupertino_icons: ^1.0.9
+  flutter_bloc: ^9.1.1
 
 dev_dependencies:
   flutter_test:
