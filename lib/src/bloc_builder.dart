@@ -1,106 +1,97 @@
 import 'package:bloc/bloc.dart';
 import 'package:jaspr/jaspr.dart';
 
-import 'bloc_provider.dart';
-import 'bloc_subscription_mixin.dart';
+import 'bloc_listener.dart';
+import 'build_context_extensions.dart';
 
-/// Signature for a function that builds a `Component` from a `BuildContext`
-/// and a state [S].
+/// Signature for a component builder based on bloc state.
 typedef BlocWidgetBuilder<S> =
     Component Function(BuildContext context, S state);
 
-/// Signature for a function that determines whether [BlocBuilder] should
-/// rebuild in response to a state change.
-///
-/// Return `true` to allow the rebuild, `false` to prevent it.
+/// Signature for the optional `buildWhen` callback.
 typedef BlocBuilderCondition<S> = bool Function(S previous, S current);
 
-/// A Jaspr component that rebuilds its UI whenever a `BlocBase` emits a new
-/// state.
-///
-/// [BlocBuilder] subscribes to the bloc's `Stream` in `initState` and calls
-/// `setState` to trigger a rebuild when a new state is received. The [builder]
-/// callback is invoked with the latest accepted state.
-///
-/// By default the nearest ancestor [BlocProvider] supplies the bloc. You may
-/// override this by passing an explicit [bloc] parameter, which is useful when
-/// you need to build against a bloc that is not in the ancestor tree.
-///
-/// Use [buildWhen] to prevent unnecessary rebuilds. When [buildWhen] returns
-/// `false` for a state transition the component keeps displaying the last
-/// accepted state.
-///
-/// ```dart
-/// BlocBuilder<CounterCubit, int>(
-///   buildWhen: (previous, current) => current != previous,
-///   builder: (context, count) {
-///     return span([Component.text('Count: $count')]);
-///   },
-/// )
-/// ```
-class BlocBuilder<B extends BlocBase<S>, S> extends StatefulComponent {
+/// Rebuilds in response to new bloc states.
+class BlocBuilder<B extends StateStreamable<S>, S>
+    extends BlocBuilderBase<B, S> {
   /// Creates a [BlocBuilder].
-  ///
-  /// The [builder] callback is required and is called with the `BuildContext`
-  /// and the current state whenever a rebuild is needed.
-  ///
-  /// If [bloc] is omitted the nearest ancestor [BlocProvider<B>] is used.
-  ///
-  /// The optional [buildWhen] predicate receives the previous and current
-  /// state and must return `true` to allow the rebuild.
   const BlocBuilder({
     required this.builder,
-    this.bloc,
-    this.buildWhen,
     super.key,
-  });
+    B? bloc,
+    BlocBuilderCondition<S>? buildWhen,
+  }) : super(bloc: bloc, buildWhen: buildWhen);
 
-  /// An optional explicit bloc instance.
-  ///
-  /// When non-null, this bloc is used instead of the nearest ancestor
-  /// [BlocProvider<B>].
-  final B? bloc;
-
-  /// Called every time the component needs to rebuild.
-  ///
-  /// Receives the `BuildContext` and the current accepted state.
+  /// Builder invoked with the current accepted state.
   final BlocWidgetBuilder<S> builder;
 
-  /// An optional predicate that controls whether a state change triggers a
-  /// rebuild.
-  ///
-  /// When omitted every state emission causes a rebuild. When provided, a
-  /// rebuild only occurs when this function returns `true`.
-  final BlocBuilderCondition<S>? buildWhen;
-
   @override
-  State<BlocBuilder<B, S>> createState() => _BlocBuilderState<B, S>();
+  Component build(BuildContext context, S state) => builder(context, state);
 }
 
-class _BlocBuilderState<B extends BlocBase<S>, S>
-    extends State<BlocBuilder<B, S>>
-    with BlocSubscriptionMixin<BlocBuilder<B, S>> {
+/// Base class for components which build from a bloc state.
+abstract class BlocBuilderBase<B extends StateStreamable<S>, S>
+    extends StatefulComponent {
+  /// Creates a [BlocBuilderBase].
+  const BlocBuilderBase({super.key, this.bloc, this.buildWhen});
+
+  /// Explicit bloc, or null to look it up from context.
+  final B? bloc;
+
+  /// Optional rebuild predicate.
+  final BlocBuilderCondition<S>? buildWhen;
+
+  /// Returns a component for [state].
+  Component build(BuildContext context, S state);
+
+  @override
+  State<BlocBuilderBase<B, S>> createState() =>
+      _BlocBuilderBaseState<B, S>();
+}
+
+class _BlocBuilderBaseState<B extends StateStreamable<S>, S>
+    extends State<BlocBuilderBase<B, S>> {
   late B _bloc;
   late S _state;
 
   @override
   void initState() {
     super.initState();
-    _bloc = component.bloc ?? BlocProvider.of<B>(context);
+    _bloc = component.bloc ?? context.read<B>();
     _state = _bloc.state;
-    subscribeTo<B, S>(
-      _bloc,
-      onState: (state) {
-        setState(() {
-          _state = state;
-        });
-      },
-      filter: component.buildWhen,
-    );
+  }
+
+  @override
+  void didUpdateComponent(covariant BlocBuilderBase<B, S> oldComponent) {
+    super.didUpdateComponent(oldComponent);
+    final oldBloc = oldComponent.bloc ?? context.read<B>();
+    final currentBloc = component.bloc ?? oldBloc;
+    if (oldBloc != currentBloc) {
+      _bloc = currentBloc;
+      _state = _bloc.state;
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final bloc = component.bloc ?? context.read<B>();
+    if (_bloc != bloc) {
+      _bloc = bloc;
+      _state = _bloc.state;
+    }
   }
 
   @override
   Component build(BuildContext context) {
-    return component.builder(context, _state);
+    if (component.bloc == null) {
+      context.select<B, bool>((bloc) => identical(_bloc, bloc));
+    }
+    return BlocListener<B, S>(
+      bloc: _bloc,
+      listenWhen: component.buildWhen,
+      listener: (context, state) => setState(() => _state = state),
+      child: component.build(context, _state),
+    );
   }
 }
