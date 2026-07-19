@@ -3,147 +3,172 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:jaspr/jaspr.dart';
 
-import 'bloc_inherited.dart';
 import 'jaspr_bloc_config.dart';
+import 'provider_compat.dart';
+import 'provider_inherited.dart';
 
-/// Signature for a function that creates a `BlocBase` instance from a
-/// `BuildContext`.
-typedef BlocCreator<T> = T Function(BuildContext context);
+/// Provides a [Bloc] or [Cubit] to descendant components.
+///
+/// The public constructor surface mirrors `flutter_bloc`'s `BlocProvider`,
+/// with Jaspr [Component]s replacing Flutter widgets.
+class BlocProvider<T extends StateStreamableSource<Object?>>
+    extends StatefulComponent
+    implements SingleChildComponent {
+  /// Creates and owns a bloc instance.
+  const BlocProvider({
+    required T Function(BuildContext context) create,
+    super.key,
+    this.child,
+    this.lazy = true,
+  }) : _create = create,
+       _value = null;
 
-/// A Jaspr component that provides a `BlocBase` instance to its descendants
-/// via dependency injection.
-///
-/// [BlocProvider] uses `InheritedComponent` to make a bloc or cubit accessible
-/// to all descendant components in the component tree.
-///
-/// Use the default constructor when you want [BlocProvider] to create and
-/// manage the lifecycle of the bloc:
-///
-/// ```dart
-/// BlocProvider<CounterCubit>(
-///   create: (context) => CounterCubit(),
-///   child: CounterPage(),
-/// )
-/// ```
-///
-/// Use the [BlocProvider.value] constructor when you want to provide an
-/// existing bloc instance without managing its lifecycle:
-///
-/// ```dart
-/// BlocProvider.value(
-///   value: existingCubit,
-///   child: CounterPage(),
-/// )
-/// ```
-///
-/// Descendants can access the bloc using [BlocProvider.of]:
-///
-/// ```dart
-/// final cubit = BlocProvider.of<CounterCubit>(context);
-/// ```
-///
-/// Or via the `BuildContext` extension:
-///
-/// ```dart
-/// final cubit = context.read<CounterCubit>();
-/// ```
-class BlocProvider<T extends BlocBase<Object?>> extends StatefulComponent {
-  final BlocCreator<T>? _create;
-  final T? _value;
-  final bool _manageLifecycle;
+  /// Provides an existing bloc instance without closing it.
+  const BlocProvider.value({
+    required T value,
+    super.key,
+    this.child,
+  }) : _value = value,
+       _create = null,
+       lazy = true;
 
-  /// The child component that will have access to the provided bloc.
-  ///
-  /// Required when used as a standalone provider. When used inside
-  /// [MultiBlocProvider], omit this — the child is provided automatically.
+  /// Component which can access the provided bloc.
   final Component? child;
 
-  /// Creates a [BlocProvider] that creates and manages the lifecycle of [T].
-  ///
-  /// The [create] function is called once when the component is initialized
-  /// to create the bloc instance. The bloc is automatically closed when
-  /// this component is disposed.
-  ///
-  /// When used standalone, [child] is required. When used inside
-  /// [MultiBlocProvider], [child] may be omitted.
-  const BlocProvider({required BlocCreator<T> create, this.child, super.key})
-    : _create = create,
-      _value = null,
-      _manageLifecycle = true;
+  /// Whether creation/listening should be deferred until first access.
+  final bool lazy;
 
-  /// Creates a [BlocProvider] that provides an existing [value] bloc.
-  ///
-  /// The provided bloc is NOT closed when this component is disposed.
-  /// Use this constructor when the bloc's lifecycle is managed externally.
-  ///
-  /// When used standalone, [child] is required. When used inside
-  /// [MultiBlocProvider], [child] may be omitted.
-  const BlocProvider.value({required T value, this.child, super.key})
-    : _value = value,
-      _create = null,
-      _manageLifecycle = false;
+  final T Function(BuildContext context)? _create;
+  final T? _value;
 
-  /// Creates a copy of this provider with [child] as the child component.
-  ///
-  /// Used internally by [MultiBlocProvider] to compose a nested provider tree.
-  /// Do not call this method directly.
-  BlocProvider<T> copyWithChild(Component child) {
-    if (_manageLifecycle) {
-      return BlocProvider<T>(create: _create!, child: child, key: key);
-    } else {
-      return BlocProvider<T>.value(value: _value!, child: child, key: key);
+  bool get _isValue => _create == null;
+
+  /// Obtains the nearest bloc of type [T].
+  static T of<T extends StateStreamableSource<Object?>>(
+    BuildContext context, {
+    bool listen = false,
+  }) {
+    try {
+      return listen
+          ? ProviderInherited.watch<T>(context)
+          : ProviderInherited.read<T>(context);
+    } on ProviderNotFoundException catch (error) {
+      if (error.valueType != T) rethrow;
+      throw StateError(
+        'BlocProvider.of() called with a context that does not contain a $T. '
+        'No ancestor could be found from the supplied Component context.',
+      );
     }
   }
 
-  /// Retrieves the nearest [BlocProvider<T>] ancestor's bloc from [context].
-  ///
-  /// Does not subscribe to changes. The calling component will not rebuild
-  /// when the bloc instance provided by [BlocProvider] changes.
-  ///
-  /// Typically used in event handlers or callbacks where reactive rebuilds
-  /// are not needed:
-  ///
-  /// ```dart
-  /// onTap: () => BlocProvider.of<CounterCubit>(context).increment(),
-  /// ```
-  ///
-  /// Throws an [AssertionError] if no [BlocProvider<T>] is found in the
-  /// ancestor tree.
-  static T of<T extends BlocBase<Object?>>(BuildContext context) {
-    return BlocInherited.readOf<T>(context);
+  @override
+  BlocProvider<T> copyWithChild(Component child) {
+    if (_isValue) {
+      return BlocProvider<T>.value(value: _value as T, key: key, child: child);
+    }
+    return BlocProvider<T>(
+      create: _create!,
+      key: key,
+      lazy: lazy,
+      child: child,
+    );
   }
 
   @override
   State<BlocProvider<T>> createState() => _BlocProviderState<T>();
 }
 
-class _BlocProviderState<T extends BlocBase<Object?>>
+class _BlocProviderState<T extends StateStreamableSource<Object?>>
     extends State<BlocProvider<T>> {
-  late T _bloc;
-  int _stateVersion = 0;
-  StreamSubscription<Object?>? _stateSubscription;
+  late ProviderController<T> _controller;
+  late ProviderController<T?> _scopeController;
+  StreamSubscription<Object?>? _subscription;
+  int _version = 0;
+  bool _ownsValue = false;
 
   @override
   void initState() {
     super.initState();
-    if (component._value != null) {
-      _bloc = component._value!;
+    _configureFrom(component);
+  }
+
+  void _configureFrom(BlocProvider<T> provider) {
+    _ownsValue = !provider._isValue;
+    if (provider._isValue) {
+      _controller = ValueProviderController<T>(
+        provider._value as T,
+        onFirstAccess: _startListening,
+      );
+      _scopeController = NullableProviderController<T>(_controller);
     } else {
-      _bloc = component._create!(context);
+      _controller = LazyProviderController<T>(
+        create: () => component._create!(context),
+        onCreate: _startListening,
+        onDispose: (bloc) => unawaited(Future<void>.sync(bloc.close)),
+      );
+      _scopeController = NullableProviderController<T>(_controller);
+      if (!provider.lazy) {
+        _controller.value;
+      }
     }
-    if (isClientEnvironment) {
-      _stateSubscription = _bloc.stream.listen((_) {
-        setState(() => _stateVersion++);
-      });
+  }
+
+  void _startListening(T bloc) {
+    if (!isClientEnvironment || _subscription != null) return;
+    _subscription = bloc.stream.listen((_) {
+      if (!mounted) return;
+      setState(() => _version++);
+    });
+  }
+
+  void _disposeCurrent() {
+    unawaited(_subscription?.cancel() ?? Future<void>.value());
+    _subscription = null;
+    if (_ownsValue) {
+      _controller.dispose();
+    }
+  }
+
+  @override
+  void didUpdateComponent(covariant BlocProvider<T> oldComponent) {
+    super.didUpdateComponent(oldComponent);
+
+    final oldWasValue = oldComponent._isValue;
+    final newIsValue = component._isValue;
+
+    if (oldWasValue && newIsValue) {
+      final shouldNotify = component._value != oldComponent._value;
+      final controller = _controller as ValueProviderController<T>;
+      if (shouldNotify) {
+        unawaited(_subscription?.cancel() ?? Future<void>.value());
+        _subscription = null;
+      }
+      controller.updateValue(
+        component._value as T,
+        restartListening: shouldNotify,
+      );
+      if (shouldNotify) _version++;
+      return;
+    }
+
+    if (oldWasValue != newIsValue) {
+      _disposeCurrent();
+      _configureFrom(component);
+      _version++;
+      return;
+    }
+
+    // Provider-owned values are preserved when the parent rebuilds, just like
+    // Flutter Provider. A lazy provider is eagerly initialized if `lazy`
+    // changes from true to false before first access.
+    if (oldComponent.lazy && !component.lazy && !_controller.hasValue) {
+      _controller.value;
     }
   }
 
   @override
   void dispose() {
-    _stateSubscription?.cancel();
-    if (component._manageLifecycle) {
-      _bloc.close();
-    }
+    _disposeCurrent();
     super.dispose();
   }
 
@@ -151,13 +176,12 @@ class _BlocProviderState<T extends BlocBase<Object?>>
   Component build(BuildContext context) {
     assert(
       component.child != null,
-      'BlocProvider requires a child component when used standalone. '
-      'Provide a child argument or use BlocProvider inside MultiBlocProvider.',
+      '${component.runtimeType} used outside of MultiBlocProvider must specify a child',
     );
-    return BlocInherited<T>(
-      bloc: _bloc,
-      stateVersion: _stateVersion,
-      child: component.child!,
+    return ProviderInherited<T?>(
+      controller: _scopeController,
+      version: _version,
+      child: component.child ?? const Component.empty(),
     );
   }
 }

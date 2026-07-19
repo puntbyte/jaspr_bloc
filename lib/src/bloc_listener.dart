@@ -1,122 +1,136 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:jaspr/jaspr.dart';
 
-import 'bloc_listener_base.dart';
-import 'bloc_provider.dart';
-import 'bloc_subscription_mixin.dart';
+import 'build_context_extensions.dart';
+import 'jaspr_bloc_config.dart';
+import 'provider_compat.dart';
 
-/// Signature for a listener callback that reacts to state changes without
-/// causing a UI rebuild.
+/// Signature for the `listener` callback.
 typedef BlocWidgetListener<S> = void Function(BuildContext context, S state);
 
-/// Signature for a function that determines whether [BlocListener] should
-/// invoke its [BlocWidgetListener] in response to a state change.
-///
-/// Return `true` to invoke the listener, `false` to suppress it.
+/// Signature for the optional `listenWhen` callback.
 typedef BlocListenerCondition<S> = bool Function(S previous, S current);
 
-/// A Jaspr component that invokes a [listener] callback on bloc state changes
-/// without rebuilding its [child].
-///
-/// [BlocListener] subscribes to the bloc's [Stream] in `initState`. On each
-/// new state (filtered by the optional [listenWhen] predicate) the [listener]
-/// is called with the current `BuildContext` and the new state.
-///
-/// The [listener] is **not** called for the bloc's initial state — only for
-/// subsequent emissions.
-///
-/// The [child] component is rendered as-is and is never rebuilt due to state
-/// changes. This makes [BlocListener] ideal for side effects such as
-/// navigation, showing snackbars, or triggering analytics events.
-///
-/// By default the nearest ancestor [BlocProvider] supplies the bloc. You may
-/// override this by passing an explicit [bloc] parameter.
-///
-/// ```dart
-/// BlocListener<AuthBloc, AuthState>(
-///   listenWhen: (previous, current) => current is AuthFailure,
-///   listener: (context, state) {
-///     // Navigate to error page, show toast, etc.
-///   },
-///   child: LoginForm(),
-/// )
-/// ```
-class BlocListener<B extends BlocBase<S>, S> extends BlocListenerBase {
+/// Invokes [listener] in response to state changes without rebuilding [child].
+class BlocListener<B extends StateStreamable<S>, S> extends BlocListenerBase<B, S> {
   /// Creates a [BlocListener].
-  ///
-  /// Both [listener] and [child] are required.
-  ///
-  /// If [bloc] is omitted the nearest ancestor [BlocProvider] is used.
-  ///
-  /// The optional [listenWhen] predicate receives the previous and current
-  /// state and must return `true` for the [listener] to be called.
   const BlocListener({
-    required this.listener,
-    required this.child,
-    this.bloc,
-    this.listenWhen,
+    required super.listener,
     super.key,
+    super.bloc,
+    super.listenWhen,
+    super.child,
+  });
+}
+
+/// Base class for components which listen to a state stream.
+abstract class BlocListenerBase<B extends StateStreamable<S>, S> extends StatefulComponent
+    implements SingleChildComponent {
+  /// Creates a [BlocListenerBase].
+  const BlocListenerBase({
+    required this.listener,
+    super.key,
+    this.bloc,
+    this.child,
+    this.listenWhen,
   });
 
-  /// An optional explicit bloc instance.
-  ///
-  /// When non-null, this bloc is used instead of the nearest ancestor
-  /// [BlocProvider<B>].
+  /// Descendant component. May be omitted in [MultiBlocListener].
+  final Component? child;
+
+  /// Explicit bloc, or null to look it up from context.
   final B? bloc;
 
-  /// The child component rendered by this [BlocListener].
-  ///
-  /// The child is never rebuilt due to state changes.
-  final Component child;
-
-  /// Called on each state change that passes [listenWhen].
-  ///
-  /// Receives the `BuildContext` and the new state. Use this callback to
-  /// trigger side effects such as navigation or notifications.
+  /// Callback invoked for accepted state changes.
   final BlocWidgetListener<S> listener;
 
-  /// An optional predicate that controls whether [listener] is called for a
-  /// given state transition.
-  ///
-  /// When omitted [listener] is called for every state emission. When
-  /// provided, [listener] is only called when this function returns `true`.
+  /// Optional state-change predicate.
   final BlocListenerCondition<S>? listenWhen;
 
-  /// Creates a copy of this listener with [child] as the child component.
-  ///
-  /// Used internally by [MultiBlocListener] to compose a nested listener tree.
-  /// Do not call this method directly.
   @override
-  BlocListener<B, S> copyWithChild(Component child) {
+  BlocListenerBase<B, S> copyWithChild(Component child) {
     return BlocListener<B, S>(
-      listener: listener,
-      child: child,
-      bloc: bloc,
-      listenWhen: listenWhen,
       key: key,
+      bloc: bloc,
+      listener: listener,
+      listenWhen: listenWhen,
+      child: child,
     );
   }
 
   @override
-  State<BlocListener<B, S>> createState() => _BlocListenerState<B, S>();
+  State<BlocListenerBase<B, S>> createState() => _BlocListenerBaseState<B, S>();
 }
 
-class _BlocListenerState<B extends BlocBase<S>, S>
-    extends State<BlocListener<B, S>>
-    with BlocSubscriptionMixin<BlocListener<B, S>> {
+class _BlocListenerBaseState<B extends StateStreamable<S>, S>
+    extends State<BlocListenerBase<B, S>> {
+  StreamSubscription<S>? _subscription;
+  late B _bloc;
+  late S _previousState;
+
   @override
   void initState() {
     super.initState();
-    final B bloc = component.bloc ?? BlocProvider.of<B>(context);
-    subscribeTo<B, S>(
-      bloc,
-      onState: (state) => component.listener(context, state),
-      filter: component.listenWhen,
-    );
+    _bloc = component.bloc ?? context.read<B>();
+    _previousState = _bloc.state;
+    _subscribe();
+  }
+
+  @override
+  void didUpdateComponent(covariant BlocListenerBase<B, S> oldComponent) {
+    super.didUpdateComponent(oldComponent);
+    final oldBloc = oldComponent.bloc ?? context.read<B>();
+    final currentBloc = component.bloc ?? oldBloc;
+    if (oldBloc != currentBloc) {
+      _switchBloc(currentBloc);
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final bloc = component.bloc ?? context.read<B>();
+    if (_bloc != bloc) {
+      _switchBloc(bloc);
+    }
+  }
+
+  void _switchBloc(B bloc) {
+    _unsubscribe();
+    _bloc = bloc;
+    _previousState = bloc.state;
+    _subscribe();
+  }
+
+  void _subscribe() {
+    if (!isClientEnvironment) return;
+    _subscription = _bloc.stream.listen((state) {
+      if (!mounted) return;
+      if (component.listenWhen?.call(_previousState, state) ?? true) {
+        component.listener(context, state);
+      }
+      _previousState = state;
+    });
+  }
+
+  void _unsubscribe() {
+    unawaited(_subscription?.cancel() ?? Future<void>.value());
+    _subscription = null;
+  }
+
+  @override
+  void dispose() {
+    _unsubscribe();
+    super.dispose();
   }
 
   @override
   Component build(BuildContext context) {
-    return component.child;
+    if (component.bloc == null) {
+      context.select<B, bool>((bloc) => identical(_bloc, bloc));
+    }
+    return component.child ?? const Component.empty();
   }
 }
