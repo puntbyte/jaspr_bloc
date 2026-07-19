@@ -183,7 +183,7 @@ void main() {
     });
   });
 
-  group('BuildContext.select<T, S, R>()', () {
+  group('BuildContext.select<T, R>()', () {
     group('returns selected value', () {
       testComponents('returns the correct initial selected value', (
         tester,
@@ -197,8 +197,8 @@ void main() {
             value: cubit,
             child: Builder(
               builder: (context) {
-                capturedValue = context.select<CounterCubit, int, int>(
-                  (state) => state * 2,
+                capturedValue = context.select<CounterCubit, int>(
+                  (cubit) => cubit.state * 2,
                 );
                 return div([Component.text('$capturedValue')]);
               },
@@ -221,8 +221,8 @@ void main() {
             value: cubit,
             child: Builder(
               builder: (context) {
-                final doubled = context.select<CounterCubit, int, int>(
-                  (state) => state * 2,
+                final doubled = context.select<CounterCubit, int>(
+                  (cubit) => cubit.state * 2,
                 );
                 return div([Component.text('doubled:$doubled')]);
               },
@@ -250,8 +250,8 @@ void main() {
             value: cubit,
             child: Builder(
               builder: (context) {
-                final isEven = context.select<CounterCubit, int, bool>(
-                  (state) => state.isEven,
+                final isEven = context.select<CounterCubit, bool>(
+                  (cubit) => cubit.state.isEven,
                 );
                 return div([Component.text('even:$isEven')]);
               },
@@ -278,8 +278,8 @@ void main() {
             value: cubit,
             child: Builder(
               builder: (context) {
-                final name = context.select<UserCubit, UserState, String>(
-                  (state) => state.name,
+                final name = context.select<UserCubit, String>(
+                  (cubit) => cubit.state.name,
                 );
                 return div([Component.text('name:$name')]);
               },
@@ -307,16 +307,16 @@ void main() {
               child: div([
                 Builder(
                   builder: (context) {
-                    final name = context.select<UserCubit, UserState, String>(
-                      (state) => state.name,
+                    final name = context.select<UserCubit, String>(
+                      (cubit) => cubit.state.name,
                     );
                     return div([Component.text('name:$name')]);
                   },
                 ),
                 Builder(
                   builder: (context) {
-                    final age = context.select<UserCubit, UserState, int>(
-                      (state) => state.age,
+                    final age = context.select<UserCubit, int>(
+                      (cubit) => cubit.state.age,
                     );
                     return div([Component.text('age:$age')]);
                   },
@@ -351,8 +351,8 @@ void main() {
               child: Builder(
                 builder: (context) {
                   buildCount++;
-                  context.select<CounterCubit, int, bool>(
-                    (state) => state.isEven,
+                  context.select<CounterCubit, bool>(
+                    (cubit) => cubit.state.isEven,
                   );
                   return const div([]);
                 },

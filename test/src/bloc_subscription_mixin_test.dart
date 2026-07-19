@@ -1,6 +1,7 @@
 import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:jaspr_bloc/jaspr_bloc.dart';
+import 'package:jaspr_bloc/src/bloc_subscription_mixin.dart';
 import 'package:jaspr_test/jaspr_test.dart';
 
 import '../helpers/client_mode.dart';
